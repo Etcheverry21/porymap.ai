@@ -21,6 +21,11 @@ qtHaveModule(network) {
 } else {
     warning("Qt module 'network' not found, disabling network features.")
 }
+qtHaveModule(concurrent) {
+    QT += concurrent
+} else {
+    warning("Qt module 'concurrent' not found, workspace indexing will be disabled.")
+}
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -158,7 +163,16 @@ SOURCES += src/core/advancemapparser.cpp \
     src/ui/uintspinbox.cpp \
     src/ui/updatepromoter.cpp \
     src/ui/wildmonchart.cpp \
-    src/ui/wildmonsearch.cpp
+    src/ui/wildmonsearch.cpp \
+    src/extensions/scripts/ScriptEditorDock.cpp \
+    src/extensions/scripts/ScriptEditorWidget.cpp \
+    src/extensions/scripts/AiAssistantDock.cpp \
+    src/extensions/scripts/AiAssistantWidget.cpp \
+    src/extensions/scripts/Services/ProjectPaths.cpp \
+    src/extensions/scripts/ProblemsView.cpp \
+    src/extensions/scripts/Syntax/PoryHighlighter.cpp \
+    src/extensions/scripts/BuildRunner.cpp \
+    src/extensions/scripts/WorkspaceIndex.cpp
 
 HEADERS  += include/core/advancemapparser.h \
     include/core/block.h \
@@ -280,7 +294,16 @@ HEADERS  += include/core/advancemapparser.h \
     include/ui/updatepromoter.h \
     include/ui/wildmonchart.h \
     include/ui/wildmonsearch.h \
-    include/ui/resizelayoutpopup.h
+    include/ui/resizelayoutpopup.h \
+    src/extensions/scripts/ScriptEditorDock.h \
+    src/extensions/scripts/ScriptEditorWidget.h \
+    src/extensions/scripts/AiAssistantDock.h \
+    src/extensions/scripts/AiAssistantWidget.h \
+    src/extensions/scripts/Services/ProjectPaths.h \
+    src/extensions/scripts/ProblemsView.h \
+    src/extensions/scripts/Syntax/PoryHighlighter.h \
+    src/extensions/scripts/BuildRunner.h \
+    src/extensions/scripts/WorkspaceIndex.h
 
 FORMS    += forms/mainwindow.ui \
     forms/colorinputwidget.ui \

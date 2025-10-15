@@ -11,6 +11,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QCloseEvent>
 #include <QAbstractItemModel>
+#include <QAction>
 #include "project.h"
 #include "orderedjson.h"
 #include "config.h"
@@ -323,6 +324,11 @@ private:
     QPointer<ProjectSettingsEditor> projectSettingsEditor = nullptr;
     QPointer<GridSettingsDialog> gridSettingsDialog = nullptr;
     QPointer<CustomScriptsEditor> customScriptsEditor = nullptr;
+    class ScriptEditorDock *scriptEditorDock = nullptr;
+    class AiAssistantDock *aiAssistantDock = nullptr;
+    class ProjectPaths *scriptProjectPaths = nullptr;
+    QAction *actionToggleScriptEditor = nullptr;
+    QAction *actionToggleAiAssistant = nullptr;
 
     QPointer<FilterChildrenProxyModel> groupListProxyModel = nullptr;
     QPointer<MapGroupModel> mapGroupModel = nullptr;
@@ -428,6 +434,7 @@ private:
     void initWindow();
     void initLogStatusBar();
     void initCustomUI();
+    void initScriptTools();
     void initExtraSignals();
     void initEditor();
     void initMiscHeapObjects();
