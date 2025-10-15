@@ -29,6 +29,9 @@
 #include "newmapgroupdialog.h"
 #include "newlocationdialog.h"
 #include "loadingscreen.h"
+#include "extensions/scripts/ScriptEditorDock.h"
+#include "extensions/scripts/AiAssistantDock.h"
+#include "extensions/scripts/Services/ProjectPaths.h"
 
 #include <QClipboard>
 #include <QDirIterator>
@@ -306,6 +309,52 @@ void MainWindow::initCustomUI() {
     // Center zooming on the mouse
     ui->graphicsView_Map->setTransformationAnchor(QGraphicsView::ViewportAnchor::AnchorUnderMouse);
     ui->graphicsView_Map->setResizeAnchor(QGraphicsView::ViewportAnchor::AnchorUnderMouse);
+
+    initScriptTools();
+}
+
+void MainWindow::initScriptTools()
+{
+    if (!scriptProjectPaths)
+        scriptProjectPaths = new ProjectPaths(this);
+
+    if (!scriptEditorDock) {
+        scriptEditorDock = new ScriptEditorDock(this);
+        scriptEditorDock->setVisible(false);
+        scriptEditorDock->setProjectPaths(scriptProjectPaths);
+        addDockWidget(Qt::RightDockWidgetArea, scriptEditorDock);
+    }
+
+    if (!aiAssistantDock) {
+        aiAssistantDock = new AiAssistantDock(this);
+        aiAssistantDock->setVisible(false);
+        aiAssistantDock->setProjectPaths(scriptProjectPaths);
+        addDockWidget(Qt::RightDockWidgetArea, aiAssistantDock);
+        tabifyDockWidget(scriptEditorDock, aiAssistantDock);
+    }
+
+    if (!actionToggleScriptEditor) {
+        actionToggleScriptEditor = new QAction(tr("Script Editor"), this);
+        actionToggleScriptEditor->setCheckable(true);
+        actionToggleScriptEditor->setChecked(scriptEditorDock->isVisible());
+        ui->menuView->addAction(actionToggleScriptEditor);
+        connect(actionToggleScriptEditor, &QAction::toggled, scriptEditorDock, &QDockWidget::setVisible);
+        connect(scriptEditorDock, &QDockWidget::visibilityChanged, actionToggleScriptEditor, &QAction::setChecked);
+    }
+
+    if (!actionToggleAiAssistant) {
+        actionToggleAiAssistant = new QAction(tr("AI Assistant"), this);
+        actionToggleAiAssistant->setCheckable(true);
+        actionToggleAiAssistant->setChecked(aiAssistantDock->isVisible());
+        ui->menuView->addAction(actionToggleAiAssistant);
+        connect(actionToggleAiAssistant, &QAction::toggled, aiAssistantDock, &QDockWidget::setVisible);
+        connect(aiAssistantDock, &QDockWidget::visibilityChanged, actionToggleAiAssistant, &QAction::setChecked);
+    }
+
+    connect(scriptProjectPaths, &ProjectPaths::projectRootChanged,
+            scriptEditorDock, &ScriptEditorDock::setProjectRoot, Qt::UniqueConnection);
+    connect(scriptProjectPaths, &ProjectPaths::projectRootChanged,
+            aiAssistantDock, &AiAssistantDock::setProjectRoot, Qt::UniqueConnection);
 }
 
 void MainWindow::initExtraSignals() {
@@ -803,6 +852,9 @@ bool MainWindow::openProject(QString dir, bool initial) {
     porymapConfig.projectManuallyClosed = false;
     porymapConfig.addRecentProject(dir);
     refreshRecentProjectsMenu();
+
+    if (scriptProjectPaths)
+        scriptProjectPaths->setProjectRoot(dir);
 
     prefab.initPrefabUI(
                 editor->metatile_selector_item,
@@ -3213,6 +3265,9 @@ bool MainWindow::closeProject() {
     clearProjectUI();
     setWindowDisabled(true);
     updateWindowTitle();
+
+    if (scriptProjectPaths)
+        scriptProjectPaths->setProjectRoot(QString());
 
     return true;
 }
